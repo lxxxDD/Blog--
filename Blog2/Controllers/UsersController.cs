@@ -85,6 +85,22 @@ namespace Blog2.Controllers
             return NoContent();
         }
 
+
+        [HttpPut("{id}")]
+        
+        public async Task<IActionResult> updateUserImg(int id, string imgUrl)
+        {
+         var user =await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+            if (user == null)
+            {
+                return Ok(user);
+
+            }
+            user.ImgUrl = imgUrl;
+           await _context.SaveChangesAsync();
+            return Ok(user);
+        }
+
         // POST: api/Users
         //注册
         [HttpPost]

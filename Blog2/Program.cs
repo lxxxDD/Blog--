@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,15 +28,17 @@ builder.Services.AddMvcCore().AddNewtonsoftJson(options =>
 });
 
 
-// 在 ConfigureServices 方法中添加跨域服务
+//测试环境或开发环境下
+//任何跨域请求都通过
+
+// 配置跨域请求策略
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAnyOrigin", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
+    options.AddPolicy("AllowAnyOriginPolicy",
+        builder =>
+        {
+            builder.AllowAnyOrigin();
+        });
 });
 
 var app = builder.Build();
@@ -46,8 +49,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("AllowAnyOrigin");
+// 使用跨域请求策略
+app.UseCors("AllowAnyOriginPolicy");
 app.UseAuthorization();
 app.UseStaticFiles();
 app.MapControllers();
