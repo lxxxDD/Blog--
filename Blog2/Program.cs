@@ -54,5 +54,4 @@ app.UseCors("AllowAnyOriginPolicy");
 app.UseAuthorization();
 app.UseStaticFiles();
 app.MapControllers();
-
 app.Run();

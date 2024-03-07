@@ -86,17 +86,17 @@ namespace Blog2.Controllers
         }
 
 
-        [HttpPut("{id}")]
+        [HttpPut]
         
-        public async Task<IActionResult> updateUserImg(int id, string imgUrl)
+        public async Task<ActionResult<IEnumerable<User>>> updateUserImg(User userImg)
         {
-         var user =await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+         var user =await _context.Users.FirstOrDefaultAsync(x => x.UserId == userImg.UserId);
             if (user == null)
             {
                 return Ok(user);
 
             }
-            user.ImgUrl = imgUrl;
+            user.ImgUrl = userImg.ImgUrl;
            await _context.SaveChangesAsync();
             return Ok(user);
         }
