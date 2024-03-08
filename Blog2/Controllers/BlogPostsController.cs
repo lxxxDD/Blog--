@@ -55,6 +55,50 @@ namespace Blog2.Controllers
             return blogPost;
         }
 
+        // GET: 获取当前用户的所有文章
+        [HttpGet]
+        public async Task<ActionResult<BlogPost>> GetUserBlogPost(int id)
+        {
+            try
+            {
+                // 从数据库或其他存储中获取当前用户的所有文章
+                var userPosts = await _context.BlogPosts
+                    .Where(post => post.UserId == id)
+                    .ToListAsync();
+
+                // 如果用户没有发布过文章，返回404错误
+                if (userPosts == null || userPosts.Count == 0)
+                {
+                    return Ok("1");
+                }
+
+                // 计算总文章数
+                int totalPosts = userPosts.Count;
+
+                // 计算总查看数和总点赞数
+                int totalViews = (int)userPosts.Sum(post => post.Views);
+                int totalLikes = (int)userPosts.Sum(post => post.Likes);
+
+                // 构造包含用户文章统计信息的对象
+                var userBlogStats = new
+                {
+                    TotalPosts = totalPosts,
+                    TotalViews = totalViews,
+                    TotalLikes = totalLikes
+                };
+
+                // 返回用户文章统计信息
+                return Ok(userBlogStats);
+            }
+            catch (Exception ex)
+            {
+                // 处理异常情况，返回500服务器内部错误
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+
+
+        }
+
         // PUT: api/BlogPosts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
