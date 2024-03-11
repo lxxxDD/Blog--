@@ -22,15 +22,15 @@ namespace Blog2.Controllers
 
         // GET: api/BlogPosts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BlogPost>>> GetBlogPosts(string title="", int addNum=0)
+        public async Task<ActionResult<IEnumerable<BlogPost>>> GetBlogPosts(string title="", int addNum=0,int CID=0)
         {
             int num = 6;
             num += addNum;
             if(!string.IsNullOrEmpty(title)) {
                  
-                return await _context.BlogPosts.Include(u=>u.User).Where(u => u.Title.Contains(title)).ToListAsync();
+                return await _context.BlogPosts.Include(u=>u.User).Where(u => u.Title.Contains(title)).OrderByDescending(u=>u.Likes).ToListAsync();
             }
-            var blogPosts = await _context.BlogPosts.Include(u => u.User).Take(num).ToListAsync();
+            var blogPosts = await _context.BlogPosts.Include(u => u.User).OrderByDescending(u => u.Likes).Take(num).ToListAsync();
 
             return blogPosts;
         }
@@ -55,9 +55,22 @@ namespace Blog2.Controllers
             return blogPost;
         }
 
+//获取当前用户的所有文章
+        [HttpGet]
+        public async Task<ActionResult<BlogPost>> GetUserBlogPostlist(int uid)
+        {
+            var blogPost = await _context.BlogPosts.Include(u => u.User).Where(u=>u.UserId==uid).ToListAsync();
+
+            if (blogPost == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(blogPost);
+        }
         // GET: 获取当前用户的所有文章
         [HttpGet]
-        public async Task<ActionResult<BlogPost>> GetUserBlogPost(int id)
+        public async Task<ActionResult<BlogPost>> GetUserBlogPostLikeAndViews(int id)
         {
             try
             {

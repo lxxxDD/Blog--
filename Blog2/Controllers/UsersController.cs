@@ -56,15 +56,19 @@ namespace Blog2.Controllers
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        [HttpPut]
+        public async Task<ActionResult<User>> PutUser(User userInfo)
         {
-            if (id != user.UserId)
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userInfo.UserId);
+            if (user==null)
             {
                 return BadRequest();
             }
+        
 
-            _context.Entry(user).State = EntityState.Modified;
+            user.Password = userInfo.Password;
+      
+            user.Username = userInfo.Username;
 
             try
             {
@@ -72,17 +76,10 @@ namespace Blog2.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+               
             }
 
-            return NoContent();
+            return Ok(user);
         }
 
 
