@@ -42,7 +42,7 @@ namespace Blog2.Controllers
             return total;
         }
         // GET: api/BlogPosts/5
-        [HttpGet("{id}")]
+        [HttpGet]
         public async Task<ActionResult<BlogPost>> GetBlogPost(int id)
         {
             var blogPost = await _context.BlogPosts.FindAsync(id);
