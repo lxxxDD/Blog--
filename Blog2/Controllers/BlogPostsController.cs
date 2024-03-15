@@ -57,16 +57,26 @@ namespace Blog2.Controllers
 
 //获取当前用户的所有文章
         [HttpGet]
-        public async Task<ActionResult<BlogPost>> GetUserBlogPostlist(int uid)
+        public async Task<ActionResult<BlogPost>> GetUserBlogPostlist(int uid,int sort=0)
         {
-            var blogPost = await _context.BlogPosts.Include(u => u.User).Where(u=>u.UserId==uid).ToListAsync();
+            var blogPostsQuery = _context.BlogPosts.Include(u => u.User).Where(u => u.UserId == uid);
 
-            if (blogPost == null)
+            if (sort == 1) {
+                blogPostsQuery = blogPostsQuery.OrderByDescending(u=>u.Views);
+
+            }else if (sort == 2)
+            {
+                //日期的格式怎么排序
+                blogPostsQuery = blogPostsQuery.OrderByDescending(u => u.CreatedAt);
+        
+            }
+            var blogPosts = await blogPostsQuery.ToListAsync();
+            if (blogPosts == null)
             {
                 return NotFound();
             }
 
-            return Ok(blogPost);
+            return Ok(blogPosts);
         }
         // GET: 获取当前用户的所有文章
         [HttpGet]
