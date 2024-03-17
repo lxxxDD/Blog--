@@ -43,16 +43,23 @@ namespace Blog2.Controllers
         }
         // GET: api/BlogPosts/5
         [HttpGet]
-        public async Task<ActionResult<BlogPost>> GetBlogPost(int id)
+        public async Task<ActionResult<BlogPost>>  GetBlogPost(int id)
         {
-            var blogPost = await _context.BlogPosts.FindAsync(id);
+            var currentBlogPost = await _context.BlogPosts.FindAsync(id);
 
-            if (blogPost == null)
+            if (currentBlogPost == null)
             {
                 return NotFound();
             }
+            // 获取其他文章，并按照发布日期进行排序
+            var orderedBlogPosts = await _context.BlogPosts.Include(u => u.Comments).Include(u=>u.User)
+                .OrderByDescending(post => post.CreatedAt) // 按照发布日期降序排序
+                .ToListAsync();
 
-            return blogPost;
+            // 将当前文章移动到排序结果的第一个位置
+            orderedBlogPosts.Remove(currentBlogPost); // 先从排序结果中移除当前文章
+            orderedBlogPosts.Insert(0, currentBlogPost); // 再将当前文章插入到排序结果的第一个位置
+            return Ok(orderedBlogPosts);
         }
 
 //获取当前用户的所有文章
@@ -78,7 +85,7 @@ namespace Blog2.Controllers
 
             return Ok(blogPosts);
         }
-        // GET: 获取当前用户的所有文章
+        // GET: 获取当前用户的所有文章汇总？？
         [HttpGet]
         public async Task<ActionResult<BlogPost>> GetUserBlogPostLikeAndViews(int id)
         {
@@ -153,6 +160,51 @@ namespace Blog2.Controllers
             return NoContent();
         }
 
+
+        //点赞接口
+        [HttpPut]
+        public async Task<IActionResult> setLike(int postId)
+        {
+            // 根据文章ID查找对应的文章
+            var blogPost = await _context.BlogPosts.FindAsync(postId);
+
+            if (blogPost == null)
+            {
+                return NotFound(); // 如果找不到文章，返回404 Not Found
+            }
+
+            // 假设您的点赞逻辑是简单地在原有的点赞数上加1
+            blogPost.Likes += 1;
+
+            // 更新数据库中的点赞数
+            _context.BlogPosts.Update(blogPost);
+            await _context.SaveChangesAsync();
+
+            // 返回点赞成功的消息给客户端
+            return Ok("点赞成功~");
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> setView(int postId)
+        {
+            // 根据文章ID查找对应的文章
+            var blogPost = await _context.BlogPosts.FindAsync(postId);
+
+            if (blogPost == null)
+            {
+                return NotFound(); // 如果找不到文章，返回404 Not Found
+            }
+
+            // 假设您的点赞逻辑是简单地在原有的点赞数上加1
+            blogPost.Views += 1;
+
+            // 更新数据库中的点赞数
+            _context.BlogPosts.Update(blogPost);
+            await _context.SaveChangesAsync();
+
+            // 返回点赞成功的消息给客户端
+            return Ok("浏览1");
+        }
         // POST: api/BlogPosts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

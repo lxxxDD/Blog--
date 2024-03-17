@@ -117,6 +117,16 @@ namespace Blog2.Controllers
                 //邮箱已注册
                 return Ok("2");
             }
+            // 选择随机头像
+            string[] randomAvatars = { "uploadImg\\SImg\\1.png", "uploadImg\\SImg\\2.png", "uploadImg\\SImg\\3.png" };
+            Random random = new Random();
+            int index = random.Next(randomAvatars.Length);
+            string selectedAvatar = randomAvatars[index];
+
+            // 分配头像路径给用户
+            user.ImgUrl = selectedAvatar;
+
+   
             user.CreatedAt = DateTime.Now;
             _context.Users.Add(user);
             await _context.SaveChangesAsync();

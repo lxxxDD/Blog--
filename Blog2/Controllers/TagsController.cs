@@ -77,7 +77,18 @@ namespace Blog2.Controllers
         [HttpPost]
         public async Task<ActionResult<Tag>> PostTag(Tag tag)
         {
-            _context.Tags.Add(tag);
+            var isuserId = await _context.Tags.FirstOrDefaultAsync(u=>u.TagId==tag.TagId);
+            if(isuserId == null)
+            {
+                _context.Tags.Add(tag);
+            }
+            else
+            {
+                //文章  BlogPost
+               //点赞统计 Tags
+                _context.Entry(tag).State = EntityState.Modified;
+            }
+           
             try
             {
                 await _context.SaveChangesAsync();

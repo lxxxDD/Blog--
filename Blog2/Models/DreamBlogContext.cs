@@ -80,10 +80,9 @@ public partial class DreamBlogContext : DbContext
             entity.HasKey(e => e.CommentId).HasName("PK__Comment__C3B4DFCA24242C83");
 
             entity.ToTable("Comment");
-
             entity.Property(e => e.Content)
-                .HasComment("评论内容")
-                .HasColumnType("text");
+           .HasColumnType("nvarchar(max)"); // 将评论内容映射到 nvarchar(max) 数据库列类型
+         
             entity.Property(e => e.CreatedAt)
                 .HasComment("评论时间")
                 .HasColumnType("datetime");
