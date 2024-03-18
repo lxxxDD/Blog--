@@ -52,7 +52,7 @@ namespace Blog2.Controllers
                 return NotFound();
             }
             // 获取其他文章，并按照发布日期进行排序
-            var orderedBlogPosts = await _context.BlogPosts.Include(u => u.Comments).Include(u=>u.User)
+            var orderedBlogPosts = await _context.BlogPosts.Include(u=>u.User)
                 .OrderByDescending(post => post.CreatedAt) // 按照发布日期降序排序
                 .ToListAsync();
 
@@ -207,9 +207,12 @@ namespace Blog2.Controllers
         }
         // POST: api/BlogPosts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
+    //发布
         [HttpPost]
         public async Task<ActionResult<BlogPost>> PostBlogPost(BlogPost blogPost)
         {
+            blogPost.CreatedAt = DateTime.Now;
             _context.BlogPosts.Add(blogPost);
             await _context.SaveChangesAsync();
 
